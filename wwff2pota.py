@@ -25,7 +25,7 @@ for root,directories,file in os.walk(path):
     for file in file:
         if(file.endswith('.adi')):
             wwffFlnm = os.path.join(root,file)
-            print(wwffFlnm)
+            #print(wwffFlnm)
             wwffFile = Path(wwffFlnm)
 
             #create new file for POTA
@@ -35,13 +35,13 @@ for root,directories,file in os.walk(path):
             #Find the wwff ref
             idx = wwffFlnm.find('@')
             wwffRef = wwffFlnm[idx+1:idx+9].upper()
-            print(wwffRef)
+            #print(wwffRef)
 
             #get corresponding pota ref
             for row in LongList:
                 if row[0] == wwffRef:
                     potaRef = row[1]
-                    print(row)
+                    #print(row)
 
             adif = wwffFile.read_text()
             adif = adif.replace('<my_sig_info:8>'+wwffRef,\
@@ -53,3 +53,5 @@ for root,directories,file in os.walk(path):
 
 # Close everything
 refFile.close()
+
+print('Conversion Done')
