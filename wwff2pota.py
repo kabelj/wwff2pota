@@ -8,38 +8,48 @@
 #
 
 import csv
+import os
 from pathlib import Path
 
-callsign = 'aa6xa'
-
 #get WWFF adif file
-wwffFlnm = input('Enter WWFF adif log to convert: ')
-wwffFile = Path(wwffFlnm)
+#wwffFlnm = input('Enter WWFF adif log to convert: ')
+#wwffFile = Path(wwffFlnm)
 
 #read csv file
 refFile = open('/home/jeff/Documents/radio/wwff-pota_ref.csv', 'r')
 LongList = csv.reader(refFile)
 
-#create new file for POTA
-potaFlnm = wwffFlnm[0:-4]+'_POTA.adi'
-potaFile = Path(potaFlnm)
+#get directory
+path = input('Enter full directory path: ')
+for root,directories,file in os.walk(path):
+    for file in file:
+        if(file.endswith('.adi')):
+            wwffFlnm = os.path.join(root,file)
+            print(wwffFlnm)
+            wwffFile = Path(wwffFlnm)
 
-#Find the wwff ref
-idx = wwffFlnm.find('@')
-wwffRef = wwffFlnm[idx+1:idx+9].upper()
-#print(wwffRef)
+            #create new file for POTA
+            potaFlnm = wwffFlnm[0:-4]+'_POTA.adi'
+            potaFile = Path(potaFlnm)
 
-#get corresponding pota ref
-for row in LongList:
-    if row[0] == wwffRef:
-        potaRef = row[1]
-#        print(row)
+            #Find the wwff ref
+            idx = wwffFlnm.find('@')
+            wwffRef = wwffFlnm[idx+1:idx+9].upper()
+            print(wwffRef)
 
-adif = wwffFile.read_text()
-adif = adif.replace('<my_sig_info:8>'+wwffRef, '<my_sig_info:6>'+potaRef)
-potaFile.write_text(adif) 
+            #get corresponding pota ref
+            for row in LongList:
+                if row[0] == wwffRef:
+                    potaRef = row[1]
+                    print(row)
+
+            adif = wwffFile.read_text()
+            adif = adif.replace('<my_sig_info:8>'+wwffRef,\
+                '<my_sig_info:6>'+potaRef)
+            potaFile.write_text(adif)
+
+            #reset csv reader
+            refFile.seek(0) 
 
 # Close everything
-#potaFile.close()
 refFile.close()
-#wwffFile.close()
